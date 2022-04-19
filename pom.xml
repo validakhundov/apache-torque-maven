@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<project
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.apache.torque.tutorial</groupId>
+    <artifactId>torque-test</artifactId>
+    <packaging>jar</packaging>
+    <name>Torque Tutorial Test Project</name>
+    <version>1.0-SNAPSHOT</version>
+
+    <dependencies>
+        <!-- Torque runtime -->
+        <dependency>
+            <artifactId>torque-runtime</artifactId>
+            <groupId>org.apache.torque</groupId>
+            <version>4.0</version>
+        </dependency>
+
+        <!-- db driver -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.3.4</version>
+        </dependency>
+
+        <!-- Logging via log4j -->
+        <dependency>
+            <artifactId>log4j</artifactId>
+            <groupId>log4j</groupId>
+            <version>1.2.16</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.torque</groupId>
+                <artifactId>torque-maven-plugin</artifactId>
+                <version>4.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>classpath</packaging>
+                            <configPackage>org.apache.torque.templates.om</configPackage>
+                            <sourceDir>src/main/schema</sourceDir>
+                            <options>
+                                <torque.om.package>org.apache.torque.tutorial.om</torque.om.package>
+                                <torque.database>postgresql</torque.database>
+                            </options>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-sql</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <packaging>classpath</packaging>
+                            <configPackage>org.apache.torque.templates.sql</configPackage>
+                            <sourceDir>src/main/schema</sourceDir>
+                            <defaultOutputDir>target/generated-sql</defaultOutputDir>
+                            <defaultOutputDirUsage>none</defaultOutputDirUsage>
+                            <options>
+                                <torque.database>postgresql</torque.database>
+                            </options>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.torque</groupId>
+                        <artifactId>torque-templates</artifactId>
+                        <version>4.0</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>
+                <version>1.4</version>
+                <configuration>
+                    <driver>org.postgresql.Driver</driver>
+                    <url>jdbc:postgresql://127.0.0.1:5432/postgres</url>
+                    <username>postgres</username>
+                    <password>postgres</password>
+                    <onError>continue</onError>
+                    <autocommit>true</autocommit>
+                    <fileset>
+                        <basedir>${basedir}/target/generated-sql</basedir>
+                        <includes>
+                            <include>*.sql</include>
+                        </includes>
+                    </fileset>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>42.3.4</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <!-- setting java version to 1.5 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
